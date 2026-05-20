@@ -1,29 +1,55 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"gioui.org/app"
 	"github.com/jfreymuth/pulse"
 
+	"hearing-eq/internal/engine"
 	"hearing-eq/internal/pastream"
 	"hearing-eq/internal/tone"
 	ui "hearing-eq/ui/hearprofile"
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags)
+	headless := flag.Bool("headless", false, "run EQ engine without the GUI")
+	flag.Parse()
+
+	eng, err := engine.New()
+	if err != nil {
+		log.Printf("hearing-eq: %v", err)
+		os.Exit(1)
+	}
+	defer eng.Close()
+
+	if *headless {
+		if err := eng.RunUntilSignal(); err != nil {
+			log.Printf("hearing-eq: %v", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	go func() {
 		w := new(app.Window)
-		w.Option(app.Title("hearprofile"), app.Size(900, 700))
+		w.Option(app.Title("hearing-eq"), app.Size(1100, 820))
 		audio, err := newPlayer()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "hearprofile: %v\n", err)
+			fmt.Fprintf(os.Stderr, "hearing-eq: %v\n", err)
 			os.Exit(1)
 		}
 		defer audio.Close()
-		if err := ui.New(w, audio).Run(); err != nil {
-			fmt.Fprintf(os.Stderr, "hearprofile: %v\n", err)
+		if _, err := eng.StartIfProfileExists(); err != nil {
+			fmt.Fprintf(os.Stderr, "hearing-eq: %v\n", err)
+			os.Exit(1)
+		}
+		if err := ui.New(w, audio, eng).Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "hearing-eq: %v\n", err)
 			os.Exit(1)
 		}
 		os.Exit(0)
@@ -32,7 +58,7 @@ func main() {
 }
 
 func newPlayer() (*pulsePlayer, error) {
-	client, err := pastream.NewClient("hearprofile")
+	client, err := pastream.NewClient("hearing-eq-profile")
 	if err != nil {
 		return nil, err
 	}

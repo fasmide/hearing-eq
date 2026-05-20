@@ -9,6 +9,10 @@ import (
 	"github.com/jfreymuth/pulse"
 )
 
+type ClientWrapper struct {
+	client *pulse.Client
+}
+
 const (
 	SampleRate   = 48000
 	Channels     = 2
@@ -23,6 +27,24 @@ func NewClient(appName string) (*pulse.Client, error) {
 		return nil, fmt.Errorf("connect pulse audio client: %w", err)
 	}
 	return client, nil
+}
+
+func NewWrappedClient(appName string) (*ClientWrapper, error) {
+	client, err := NewClient(appName)
+	if err != nil {
+		return nil, err
+	}
+	return &ClientWrapper{client: client}, nil
+}
+
+func (c *ClientWrapper) Client() *pulse.Client {
+	return c.client
+}
+
+func (c *ClientWrapper) Close() {
+	if c != nil && c.client != nil {
+		c.client.Close()
+	}
 }
 
 func ResolveHardwareDefaultSink(client *pulse.Client, avoidID string) (*pulse.Sink, error) {
@@ -139,7 +161,16 @@ type Duplex struct {
 	fatalCh  chan error
 }
 
+type ProcessTap func(input []float32, output []float32)
+
 func StartDuplex(client *pulse.Client, monitorSinkID string, process func([]float32), mediaName string) (*Duplex, error) {
+	return StartDuplexWithTap(client, monitorSinkID, func(input []float32, output []float32) {
+		copy(output, input)
+		process(output)
+	}, mediaName)
+}
+
+func StartDuplexWithTap(client *pulse.Client, monitorSinkID string, process ProcessTap, mediaName string) (*Duplex, error) {
 	sink, err := waitForSink(client, monitorSinkID, 2*time.Second)
 	if err != nil {
 		return nil, err
@@ -160,9 +191,10 @@ func StartDuplex(client *pulse.Client, monitorSinkID string, process func([]floa
 					d.reportFatal(err)
 				}
 			}()
-			buf := append(make([]float32, 0, len(in)), in...)
-			process(buf)
-			d.enqueue(buf)
+			input := append(make([]float32, 0, len(in)), in...)
+			output := append(make([]float32, 0, len(in)), in...)
+			process(input, output)
+			d.enqueue(output)
 			return len(in), nil
 		}),
 		pulse.RecordStereo,

@@ -5,6 +5,7 @@ go 1.26.3
 require (
 	gioui.org v0.10.0 // indirect
 	gioui.org/shader v1.0.8 // indirect
+	github.com/10d9e/gofft v0.6.2 // indirect
 	github.com/go-text/typesetting v0.3.4 // indirect
 	github.com/jfreymuth/pulse v0.1.1 // indirect
 	github.com/the-jonsey/pulseaudio v0.0.1 // indirect

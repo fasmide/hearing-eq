@@ -7,21 +7,29 @@ Personalized hearing-threshold measurement and per-ear equalization for Linux de
 - Linux x86_64
 - PipeWire running with `pipewire-pulse` enabled
 - Go 1.22 or newer
-- For `hearprofile`, Gio's Linux desktop backend requires standard system graphics development libraries at build time
+- Gio's Linux desktop backend requires standard system graphics development libraries at build time
 
 ## Build
 
 ```bash
-go build ./cmd/hearprofile
-go build ./cmd/heareq
+go build ./cmd/hearing-eq
 ```
 
 ## Usage
 
-1. Run `hearprofile` once.
-2. Complete the hearing test and save the profile.
-3. Run `heareq` in a terminal.
-4. Route applications to the `Hearing-EQ` sink with `pavucontrol`, `helvum`, or `wpctl set-default`.
+1. Run `hearing-eq` to open the GUI.
+2. Review the currently saved profile, if any.
+3. Complete the hearing test and save the profile.
+4. Leave `hearing-eq` running to process audio through the `Hearing-EQ` sink.
+5. Route applications to the `Hearing-EQ` sink with `pavucontrol`, `helvum`, or `wpctl set-default`.
+
+Headless mode:
+
+```bash
+./hearing-eq --headless
+```
+
+The GUI also shows a live spectrum display for the captured input plus the left and right processed output channels.
 
 The profile is saved to `~/.config/hearing-eq/profile.json`.
 
