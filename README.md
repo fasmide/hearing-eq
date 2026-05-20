@@ -4,6 +4,16 @@ Experimental personalized hearing-threshold measurement and per-ear equalization
 
 This project should be treated as a hobby / toy audio tool, not as a medically reliable hearing test.
 
+## The Idea
+
+1. Take a hearing test in the app.
+2. Use that result to build a personalized EQ profile.
+3. Play your audio through that profile.
+
+The goal is to make playback feel more balanced by compensating for the frequencies each ear seems to hear less strongly during the test.
+
+In other words, the app measures a rough per-ear frequency response for your hearing, then turns that into an EQ curve you can listen through on your desktop.
+
 ![screenshot](https://github.com/user-attachments/assets/94e0ec89-ba91-4fa4-840d-d004a965b193)
 
 ## Requirements
