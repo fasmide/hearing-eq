@@ -4,6 +4,8 @@ Experimental personalized hearing-threshold measurement and per-ear equalization
 
 This project should be treated as a hobby / toy audio tool, not as a medically reliable hearing test.
 
+![https://github.com/user-attachments/assets/94e0ec89-ba91-4fa4-840d-d004a965b193](Screenshot)
+
 ## Requirements
 
 - Linux x86_64
