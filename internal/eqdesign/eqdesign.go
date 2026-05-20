@@ -14,15 +14,15 @@ const (
 )
 
 type Band struct {
-	FrequencyHz float64
-	GainDB      float64
-	Q           float64
+	FrequencyHz  float64
+	GainDB       float64
+	Q            float64
 	Coefficients biquad.Coefficients
 }
 
 type Design struct {
-	Left               []Band
-	Right              []Band
+	Left                []Band
+	Right               []Band
 	GlobalAttenuationDB float64
 }
 

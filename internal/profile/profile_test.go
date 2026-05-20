@@ -13,11 +13,11 @@ func TestRoundTrip(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, FileName)
 	want := &Profile{
-		Version:              Version,
-		CreatedAt:            time.Date(2026, 5, 18, 14, 32, 0, 0, time.UTC),
-		FrequenciesHz:        append([]float64(nil), DefaultFrequenciesHz...),
-		LeftThresholdsDBFS:   []float64{-42.5, -48.0, -52.5, -55.0, -53.5, -50.0, -45.0, -38.5, -32.0},
-		RightThresholdsDBFS:  []float64{-41.0, -47.5, -53.0, -55.5, -54.0, -49.5, -44.0, -37.0, -30.5},
+		Version:             Version,
+		CreatedAt:           time.Date(2026, 5, 18, 14, 32, 0, 0, time.UTC),
+		FrequenciesHz:       append([]float64(nil), DefaultFrequenciesHz...),
+		LeftThresholdsDBFS:  []float64{-42.5, -48.0, -52.5, -55.0, -53.5, -50.0, -45.0, -38.5, -32.0},
+		RightThresholdsDBFS: []float64{-41.0, -47.5, -53.0, -55.5, -54.0, -49.5, -44.0, -37.0, -30.5},
 	}
 	if err := Save(path, want); err != nil {
 		t.Fatalf("Save() error = %v", err)

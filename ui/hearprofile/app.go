@@ -1,10 +1,10 @@
 package hearprofile
 
 import (
+	"errors"
 	"fmt"
 	"image"
 	"image/color"
-	"errors"
 	"math"
 	"math/rand"
 	"os"
@@ -63,28 +63,28 @@ type App struct {
 	screen Screen
 	err    error
 
-	continueBtn widget.Clickable
-	saveBtn     widget.Clickable
-	hearBtn     widget.Clickable
-	abortBtn    widget.Clickable
-	backBtn     widget.Clickable
-	selectBtns  []widget.Clickable
-	renameBtns  []widget.Clickable
-	deleteBtns  []widget.Clickable
+	continueBtn    widget.Clickable
+	saveBtn        widget.Clickable
+	hearBtn        widget.Clickable
+	abortBtn       widget.Clickable
+	backBtn        widget.Clickable
+	selectBtns     []widget.Clickable
+	renameBtns     []widget.Clickable
+	deleteBtns     []widget.Clickable
 	renameSaveBtns []widget.Clickable
-	saveAsBtn   widget.Clickable
-	nameEditor  widget.Editor
-	renameEditor widget.Editor
+	saveAsBtn      widget.Clickable
+	nameEditor     widget.Editor
+	renameEditor   widget.Editor
 
-	testPlan []TestPoint
-	current  int
-	active   *staircase.Staircase
-	left     []float64
-	right    []float64
+	testPlan        []TestPoint
+	current         int
+	active          *staircase.Staircase
+	left            []float64
+	right           []float64
 	selectedProfile string
-	profiles []profile.NamedProfile
-	loadedAt time.Time
-	hasSaved bool
+	profiles        []profile.NamedProfile
+	loadedAt        time.Time
+	hasSaved        bool
 	renamingProfile string
 
 	runningTest    bool
@@ -293,8 +293,8 @@ func (a *App) layoutBadge(gtx layout.Context, text string, bgColor color.NRGBA) 
 		}),
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 			return inset.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-		lbl := material.Label(a.theme, unit.Sp(13), text)
-		lbl.Color = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+				lbl := material.Label(a.theme, unit.Sp(13), text)
+				lbl.Color = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 				return lbl.Layout(gtx)
 			})
 		}),
@@ -760,10 +760,8 @@ func (a *App) onSelectProfile(i int) {
 		a.err = fmt.Errorf("select profile: %w", err)
 		return
 	}
-	a.renamingProfile = ""
-	a.renameEditor.SetText("")
-	a.loadSavedProfile()
-	a.refreshProfiles()
+	a.resetRenameState()
+	a.reloadProfilesView()
 	if a.eng != nil {
 		if err := a.eng.EnsureStartedWithCurrentProfile(); err != nil {
 			a.err = fmt.Errorf("reload EQ engine: %w", err)
@@ -788,10 +786,8 @@ func (a *App) onConfirmRename(i int) {
 		a.err = fmt.Errorf("rename profile: %w", err)
 		return
 	}
-	a.renamingProfile = ""
-	a.renameEditor.SetText("")
-	a.loadSavedProfile()
-	a.refreshProfiles()
+	a.resetRenameState()
+	a.reloadProfilesView()
 	if a.eng != nil {
 		if err := a.eng.EnsureStartedWithCurrentProfile(); err != nil {
 			a.err = fmt.Errorf("reload EQ engine: %w", err)
@@ -807,20 +803,28 @@ func (a *App) onDeleteProfile(i int) {
 		a.err = fmt.Errorf("delete profile: %w", err)
 		return
 	}
-	a.renamingProfile = ""
-	a.renameEditor.SetText("")
+	a.resetRenameState()
 	a.left = make([]float64, len(profile.DefaultFrequenciesHz))
 	a.right = make([]float64, len(profile.DefaultFrequenciesHz))
 	a.hasSaved = false
 	a.selectedProfile = ""
 	a.loadedAt = time.Time{}
-	a.loadSavedProfile()
-	a.refreshProfiles()
+	a.reloadProfilesView()
 	if a.eng != nil && a.hasSaved {
 		if err := a.eng.EnsureStartedWithCurrentProfile(); err != nil {
 			a.err = fmt.Errorf("reload EQ engine: %w", err)
 		}
 	}
+}
+
+func (a *App) resetRenameState() {
+	a.renamingProfile = ""
+	a.renameEditor.SetText("")
+}
+
+func (a *App) reloadProfilesView() {
+	a.loadSavedProfile()
+	a.refreshProfiles()
 }
 
 func (a *App) startCurrentBand() {

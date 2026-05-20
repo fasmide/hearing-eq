@@ -18,31 +18,31 @@ const (
 )
 
 type Snapshot struct {
-	UpdatedAt time.Time
+	UpdatedAt        time.Time
 	UpdatesPerSecond float64
-	FrequenciesHz []float64
-	InputDB   []float64
-	LeftDB    []float64
-	RightDB   []float64
+	FrequenciesHz    []float64
+	InputDB          []float64
+	LeftDB           []float64
+	RightDB          []float64
 }
 
 type Analyzer struct {
-	mu        sync.RWMutex
-	fft       gofft.Fft
-	fftSize   int
-	window    []float64
-	inputBuf  []float64
-	leftBuf   []float64
-	rightBuf  []float64
-	tmpInput  []float64
-	tmpLeft   []float64
-	tmpRight  []float64
-	writePos  int
-	filled    int
-	pending   int
+	mu         sync.RWMutex
+	fft        gofft.Fft
+	fftSize    int
+	window     []float64
+	inputBuf   []float64
+	leftBuf    []float64
+	rightBuf   []float64
+	tmpInput   []float64
+	tmpLeft    []float64
+	tmpRight   []float64
+	writePos   int
+	filled     int
+	pending    int
 	lastUpdate time.Time
-	ups       float64
-	snapshot  Snapshot
+	ups        float64
+	snapshot   Snapshot
 }
 
 func New() (*Analyzer, error) {
@@ -119,15 +119,14 @@ func (a *Analyzer) Snapshot() Snapshot {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
 	return Snapshot{
-		UpdatedAt: a.snapshot.UpdatedAt,
+		UpdatedAt:        a.snapshot.UpdatedAt,
 		UpdatesPerSecond: a.snapshot.UpdatesPerSecond,
-		FrequenciesHz: append([]float64(nil), a.snapshot.FrequenciesHz...),
-		InputDB:   append([]float64(nil), a.snapshot.InputDB...),
-		LeftDB:    append([]float64(nil), a.snapshot.LeftDB...),
-		RightDB:   append([]float64(nil), a.snapshot.RightDB...),
+		FrequenciesHz:    append([]float64(nil), a.snapshot.FrequenciesHz...),
+		InputDB:          append([]float64(nil), a.snapshot.InputDB...),
+		LeftDB:           append([]float64(nil), a.snapshot.LeftDB...),
+		RightDB:          append([]float64(nil), a.snapshot.RightDB...),
 	}
 }
-
 
 func copyFromRing(dst, src []float64, writePos int) {
 	n := copy(dst, src[writePos:])
@@ -163,7 +162,6 @@ func computeSpectrum(fft gofft.Fft, window, frequenciesHz, samples, reuse []floa
 func cmplxAbs(v complex128) float64 {
 	return math.Hypot(real(v), imag(v))
 }
-
 
 func binFrequencies(fftSize int) []float64 {
 	half := fftSize / 2

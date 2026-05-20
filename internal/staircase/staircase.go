@@ -86,7 +86,7 @@ func (s *Staircase) Result() (Result, error) {
 		ReversalLevels: append([]float64(nil), s.reversals...),
 		Trials:         s.trials,
 	}, nil
-	}
+}
 
 func (s *Staircase) move(direction int) {
 	if s.lastDirection != 0 && direction != s.lastDirection {

@@ -183,8 +183,8 @@ func StartDuplexWithTap(client *pulse.Client, monitorSinkID string, process Proc
 		queue:   make(chan []float32, 8),
 		fatalCh: make(chan error, 1),
 	}
-		record, err := client.NewRecord(
-			pulse.Float32Writer(func(in []float32) (n int, err error) {
+	record, err := client.NewRecord(
+		pulse.Float32Writer(func(in []float32) (n int, err error) {
 			defer func() {
 				if r := recover(); r != nil {
 					err = fmt.Errorf("audio record callback panic: %v", r)

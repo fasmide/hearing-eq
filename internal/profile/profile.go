@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	Version     = 1
-	DirName     = "hearing-eq"
-	FileName    = "profile.json"
-	tmpFileName = "profile.json.tmp"
+	Version         = 1
+	DirName         = "hearing-eq"
+	FileName        = "profile.json"
+	tmpFileName     = "profile.json.tmp"
 	ProfilesDirName = "profiles"
 	CurrentNameFile = "current_profile.txt"
 	FlatProfileName = "Flat"
@@ -25,10 +25,10 @@ const (
 var DefaultFrequenciesHz = []float64{80, 200, 500, 1000, 2000, 3000, 4500, 7000, 10000}
 
 type Profile struct {
-	Version            int       `json:"version"`
-	CreatedAt          time.Time `json:"created_at"`
-	FrequenciesHz      []float64 `json:"frequencies_hz"`
-	LeftThresholdsDBFS []float64 `json:"left_thresholds_dbfs"`
+	Version             int       `json:"version"`
+	CreatedAt           time.Time `json:"created_at"`
+	FrequenciesHz       []float64 `json:"frequencies_hz"`
+	LeftThresholdsDBFS  []float64 `json:"left_thresholds_dbfs"`
 	RightThresholdsDBFS []float64 `json:"right_thresholds_dbfs"`
 }
 
@@ -174,6 +174,12 @@ func List() ([]NamedProfile, error) {
 		})
 	}
 	sort.Slice(out, func(i, j int) bool {
+		if out[i].Name == FlatProfileName {
+			return true
+		}
+		if out[j].Name == FlatProfileName {
+			return false
+		}
 		return strings.ToLower(out[i].Name) < strings.ToLower(out[j].Name)
 	})
 	return out, nil
